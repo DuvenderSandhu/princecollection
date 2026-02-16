@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Professional Shop Manager</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+      padding: 16px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 24px;
+    }
+
+    @media (max-width: 1024px) {
+      .container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+
+    header {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      color: white;
+      padding: 20px 24px;
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 24px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 12px 20px;
+      border-radius: 8px;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 16px;
+    }
+
+    /* Products Section */
+    .products-section {
+      padding: 20px;
+    }
+
+    .products-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .search-hint {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      max-height: 500px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      }
+    }
+
+    .product-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 16px;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .product-card:hover {
+      border-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .product-name {
+      font-weight: 600;
+      font-size: 16px;
+      color: #1e293b;
+      margin-bottom: 8px;
+      padding-right: 24px;
+    }
+
+    .product-price {
+      color: #059669;
+      font-weight: 700;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .product-stock {
+      display: inline-block;
+      padding: 4px 12px;
+      background: #f1f5f9;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #475569;
+      margin-bottom: 8px;
+    }
+
+    .product-stock.low {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .product-stock.out {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .product-category {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    .product-id {
+      font-size: 10px;
+      color: #94a3b8;
+      margin-bottom: 8px;
+    }
+
+    .add-btn {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .add-btn:hover {
+      background: #1d4ed8;
+      transform: scale(1.05);
+    }
+
+    .add-btn:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .action-buttons-card {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 4px;
+    }
+
+    .edit-btn, .delete-btn {
+      width: 28px;
+      height: 28px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .edit-btn {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .edit-btn:hover {
+      background: #e2e8f0;
+    }
+
+    .delete-btn {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .delete-btn:hover {
+      background: #fecaca;
+    }
+
+    /* Cart Section */
+    .cart-section {
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+    }
+
+    .cart-header {
+      padding: 20px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .cart-items-container {
+      padding: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .cart-item-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .cart-item-name {
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .cart-item-price {
+      color: #2563eb;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .cart-item-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .qty-btn {
+      width: 28px;
+      height: 28px;
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qty-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .qty-value {
+      min-width: 24px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .remove-btn {
+      width: 28px;
+      height: 28px;
+      background: #fee2e2;
+      color: #dc2626;
+      border: none;
+      border-radius: 6px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .remove-btn:hover {
+      background: #fecaca;
+    }
+
+    .cart-summary {
+      padding: 20px;
+      border-top: 1px solid #e2e8f0;
+      background: #f8fafc;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #475569;
+    }
+
+    .summary-total {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e293b;
+      padding-top: 12px;
+      border-top: 2px solid #cbd5e1;
+      margin-top: 12px;
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .btn-secondary:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+
+    .btn-success {
+      background: #059669;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #047857;
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 40px 20px;
+      color: #94a3b8;
+    }
+
+    .empty-cart-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.3;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: translateY(-20px);
+      transition: transform 0.3s;
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #475569;
+      font-size: 14px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    /* Bill Preview */
+    .bill-preview {
+      background: white;
+      padding: 24px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      font-family: 'Courier New', monospace;
+    }
+
+    .bill-header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #2563eb;
+    }
+
+    .bill-header h2 {
+      margin: 0 0 8px 0;
+      color: #2563eb;
+    }
+
+    .bill-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .bill-items {
+      margin: 20px 0;
+    }
+
+    .bill-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px dashed #e2e8f0;
+      font-size: 14px;
+    }
+
+    .bill-item-header {
+      font-weight: 600;
+      color: #475569;
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
+    }
+
+    .bill-total {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 3px double #2563eb;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    /* Notification */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #10b981;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      animation: slideIn 0.3s ease;
+      z-index: 1001;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .page-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .page-btn.active {
+      background: #2563eb;
+      color: white;
+      border-color: #2563eb;
+    }
+
+    .page-btn:hover:not(.active) {
+      background: #f1f5f9;
+    }
+
+    /* Cart View All */
+    .view-all-btn {
+      width: 100%;
+      padding: 8px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      color: #475569;
+      font-size: 12px;
+      cursor: pointer;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .view-all-btn:hover {
+      background: #e2e8f0;
+    }
+
+    /* Print Styles */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-bill, #print-bill * {
+        visibility: visible;
+      }
+      #print-bill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 20px;
+      }
+    }
+
+    /* Sync Status */
+    .sync-status {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #10b981;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .sync-status.offline {
+      background: #ef4444;
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+    }
+
+    .loading-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #2563eb;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Products Section -->
+    <div class="card">
+      <header>
+        <div class="header-content">
+          <h1>Shop Manager</h1>
+          <div class="stats-bar">
+            <div class="stat-item">
+              <div class="stat-value" id="daily-profit">Rs. 0.00</div>
+              <div class="stat-label">Daily Profit</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="total-sales">0</div>
+              <div class="stat-label">Total Sales</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="total-products">0</div>
+              <div class="stat-label">Products</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="products-section">
+        <div class="products-header">
+          <div class="search-box">
+            <input type="text" 
+                   class="search-input" 
+                   id="product-search" 
+                   placeholder="Search by name, category, price...">
+            <div class="search-hint" id="search-hint">Showing all products</div>
+          </div>
+          <button class="btn btn-success" id="add-product-btn">
+            + Add Product
+          </button>
+        </div>
+        
+        <div class="products-grid" id="products-grid">
+          <!-- Products will be loaded here -->
+        </div>
+        
+        <div class="pagination" id="pagination">
+          <!-- Pagination buttons -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Cart Section -->
+    <div class="card cart-section">
+      <div class="cart-header">
+        <div class="section-title">Current Sale</div>
+      </div>
+      
+      <div class="cart-items-container" id="cart-items">
+        <div class="empty-cart">
+          <div class="empty-cart-icon">🛒</div>
+          <p>Your cart is empty</p>
+        </div>
+      </div>
+      
+      <div class="cart-summary">
+        <div class="summary-row">
+          <span>Items:</span>
+          <span id="cart-items-count">0</span>
+        </div>
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span id="cart-subtotal">Rs. 0.00</span>
+        </div>
+        <div class="summary-row summary-total">
+          <span>Total:</span>
+          <span id="cart-total">Rs. 0.00</span>
+        </div>
+        
+        <div class="action-buttons">
+          <button class="btn btn-secondary" id="clear-cart-btn">
+            Clear
+          </button>
+          <button class="btn btn-primary" id="complete-sale-btn">
+            Checkout
+          </button>
+        </div>
+        
+        <button class="btn btn-danger" id="reset-day-btn" style="width: 100%; margin-top: 12px;">
+          Reset Day
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Product Modal -->
+  <div class="modal-overlay" id="product-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="section-title" id="product-modal-title">Add New Product</div>
+      </div>
+      <div class="modal-body">
+        <form id="product-form">
+          <input type="hidden" id="product-id">
+          <input type="hidden" id="product-mode" value="add">
+          
+          <div class="form-group">
+            <label class="form-label">Product Name *</label>
+            <input type="text" class="form-input" id="product-name" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Price (Rs.) *</label>
+            <input type="number" class="form-input" id="product-price" step="0.01" min="0" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Stock Quantity *</label>
+            <input type="number" class="form-input" id="product-stock" min="0" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <input type="text" class="form-input" id="product-category">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Minimum Stock Alert</label>
+            <input type="number" class="form-input" id="product-minstock" value="10" min="0">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Cost Price (for profit calc)</label>
+            <input type="number" class="form-input" id="product-costprice" step="0.01" min="0" value="0">
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="cancel-product-btn">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="save-product-btn">
+              Save Product
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-overlay" id="delete-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="section-title">Confirm Delete</div>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 20px;">Are you sure you want to delete this product? This action cannot be undone.</p>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="cancel-delete-btn">
+            Cancel
+          </button>
+          <button class="btn btn-danger" id="confirm-delete-btn">
+            Delete Product
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Details Modal -->
+  <div class="modal-overlay" id="customer-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="section-title">Customer Details</div>
+      </div>
+      <div class="modal-body">
+        <form id="customer-form">
+          <div class="form-group">
+            <label class="form-label">Customer Name *</label>
+            <input type="text" class="form-input" id="customer-name" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" class="form-input" id="customer-phone">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="customer-email">
+          </div>
+          
+          <div class="modal-actions">
+            <button type="button" class="btn btn-secondary" id="skip-customer-btn">
+              Skip
+            </button>
+            <button type="submit" class="btn btn-primary">
+              Generate Bill
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bill Preview Modal -->
+  <div class="modal-overlay" id="bill-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="section-title">Bill Preview</div>
+      </div>
+      <div class="modal-body">
+        <div id="bill-preview" class="bill-preview"></div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="close-bill-btn">
+            Close
+          </button>
+          <button class="btn btn-success" id="print-bill-btn">
+            Print Bill
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Hidden iframe and form for Google Sheets -->
+  <iframe name="hiddenFrame" style="display:none;"></iframe>
+  
+  <form id="hiddenForm"
+        method="post"
+        action="https://script.google.com/macros/s/AKfycby8IbJE5QHGNbMDtUkapsfaISlqgRBstughEV4Nf-iJN7oPBF-DSGjsOoBbBQuxg3Q/exec"
+        target="hiddenFrame"
+        style="display:none;">
+    <input type="hidden" name="action">
+    <input type="hidden" name="id">
+    <input type="hidden" name="name">
+    <input type="hidden" name="price">
+    <input type="hidden" name="stock">
+    <input type="hidden" name="category">
+    <input type="hidden" name="minstock">
+    <input type="hidden" name="costprice">
+    
+    <!-- Sale fields -->
+    <input type="hidden" name="billid">
+    <input type="hidden" name="customername">
+    <input type="hidden" name="phone">
+    <input type="hidden" name="email">
+    <input type="hidden" name="itemsjson">
+    <input type="hidden" name="subtotal">
+    <input type="hidden" name="tax">
+    <input type="hidden" name="discount">
+    <input type="hidden" name="total">
+    <input type="hidden" name="paymentmethod">
+    <input type="hidden" name="status">
+    <input type="hidden" name="notes">
+  </form>
+
+  <!-- Hidden div for printing -->
+  <div id="print-bill" style="display: none;"></div>
+
+  <script>
+    // ============================================
+    // CONFIGURATION
+    // ============================================
+    const API_URL = "https://script.google.com/macros/s/AKfycby8IbJE5QHGNbMDtUkapsfaISlqgRBstughEV4Nf-iJN7oPBF-DSGjsOoBbBQuxg3Q/exec";
+    
+    // State
+    let products = [];
+    let cart = [];
+    let dailyProfit = 0;
+    let totalSales = 0;
+    let currentPage = 1;
+    let itemsPerPage = 12;
+    let searchTerm = "";
+    let currentSaleItems = [];
+    let currentBillTotal = 0;
+    let editingProductId = null;
+    let deletingProductId = null;
+
+    // DOM Elements
+    const productsGrid = document.getElementById('products-grid');
+    const cartItemsContainer = document.getElementById('cart-items');
+    const productSearch = document.getElementById('product-search');
+    const searchHint = document.getElementById('search-hint');
+    const pagination = document.getElementById('pagination');
+    const addProductBtn = document.getElementById('add-product-btn');
+    const clearCartBtn = document.getElementById('clear-cart-btn');
+    const completeSaleBtn = document.getElementById('complete-sale-btn');
+    const resetDayBtn = document.getElementById('reset-day-btn');
+    const productModal = document.getElementById('product-modal');
+    const deleteModal = document.getElementById('delete-modal');
+    const customerModal = document.getElementById('customer-modal');
+    const billModal = document.getElementById('bill-modal');
+    const productForm = document.getElementById('product-form');
+    const customerForm = document.getElementById('customer-form');
+    const cancelProductBtn = document.getElementById('cancel-product-btn');
+    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    const skipCustomerBtn = document.getElementById('skip-customer-btn');
+    const closeBillBtn = document.getElementById('close-bill-btn');
+    const printBillBtn = document.getElementById('print-bill-btn');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const printBillDiv = document.getElementById('print-bill');
+    const hiddenForm = document.getElementById('hiddenForm');
+
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
+    
+    function showLoading(show) {
+      loadingOverlay.classList.toggle('active', show);
+    }
+
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      setTimeout(() => notification.remove(), 3000);
+    }
+
+    function updateSyncStatus(connected) {
+      let statusEl = document.getElementById('sync-status');
+      if (!statusEl) {
+        statusEl = document.createElement('div');
+        statusEl.id = 'sync-status';
+        document.body.appendChild(statusEl);
+      }
+      statusEl.className = `sync-status ${connected ? 'online' : 'offline'}`;
+      statusEl.textContent = connected ? '✓ Google Sheets Connected' : '⚠️ Offline Mode';
+    }
+
+    function closeAllModals() {
+      productModal.classList.remove('active');
+      deleteModal.classList.remove('active');
+      customerModal.classList.remove('active');
+      billModal.classList.remove('active');
+    }
+
+    // ============================================
+    // GOOGLE SHEETS API FUNCTIONS
+    // ============================================
+
+    // Load all products
+    async function loadProducts() {
+      showLoading(true);
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        
+        if (data.status === "success" && data.products) {
+          products = data.products.map(p => ({
+            id: Number(p.ID),
+            name: p.Name || "",
+            price: Number(p.Price) || 0,
+            stock: Number(p.Stock) || 0,
+            category: p.Category || "General",
+            minStock: Number(p.MinStock) || 10,
+            costPrice: Number(p.CostPrice) || 0
+          }));
+          
+          renderProducts();
+          updateStats();
+          saveToStorage();
+          updateSyncStatus(true);
+          showNotification('Products loaded successfully');
+        } else {
+          throw new Error('Failed to load products');
+        }
+        if (data.status === "success" && data.sales) {
+// Filter today's sales
+const todaySales = data.sales.filter(sale => 
+  new Date(sale.DateTime).toDateString() === new Date().toDateString()
+);
+
+// Calculate total sales (number of transactions)
+totalSales = todaySales.length;
+
+// Calculate daily profit (using cost price from products)
+dailyProfit = todaySales.reduce((sum, sale) => {
+  const items = JSON.parse(sale.ItemsJSON);
+  return sum + items.reduce((itemSum, item) => {
+    const product = products.find(p => p.id === item.id);
+    return itemSum + ((item.price - (product?.costPrice || 0)) * item.quantity);
+  }, 0);
+}, 0);
+          renderProducts();
+          updateStats();
+          saveToStorage();
+          updateSyncStatus(true);
+          showNotification('Products loaded successfully');
+        } else {
+          throw new Error('Failed to load products');
+        }
+      } catch (error) {
+        console.error('Load failed:', error);
+        loadFromStorage();
+        updateSyncStatus(false);
+        showNotification('Using local data');
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // Submit form to Google Sheets
+    function submitForm(action, data) {
+      hiddenForm.action.value = action;
+      
+      // Map all fields
+      hiddenForm.id.value = data.id || "";
+      hiddenForm.name.value = data.name || "";
+      hiddenForm.price.value = data.price || "";
+      hiddenForm.stock.value = data.stock || "";
+      hiddenForm.category.value = data.category || "";
+      hiddenForm.minstock.value = data.minstock || "";
+      hiddenForm.costprice.value = data.costprice || "";
+      
+      // Sale fields
+      hiddenForm.billid.value = data.billid || "";
+      hiddenForm.customername.value = data.customername || "";
+      hiddenForm.phone.value = data.phone || "";
+      hiddenForm.email.value = data.email || "";
+      hiddenForm.itemsjson.value = data.itemsjson || "";
+      hiddenForm.subtotal.value = data.subtotal || "";
+      hiddenForm.tax.value = data.tax || "";
+      hiddenForm.discount.value = data.discount || "";
+      hiddenForm.total.value = data.total || "";
+      hiddenForm.paymentmethod.value = data.paymentmethod || "";
+      hiddenForm.status.value = data.status || "";
+      hiddenForm.notes.value = data.notes || "";
+      
+      hiddenForm.submit();
+      
+      showLoading(true);
+      setTimeout(() => {
+        showLoading(false);
+        loadProducts();
+        showNotification(`${action} completed`);
+      }, 2000);
+    }
+
+    // ============================================
+    // PRODUCT FUNCTIONS
+    // ============================================
+
+    // Get next available ID
+    function getNextProductId() {
+      if (products.length === 0) return 1;
+      const maxId = Math.max(...products.map(p => p.id));
+      return maxId + 1;
+    }
+
+    // Filter products by search term (searches name, category, price)
+    function filterProducts() {
+      if (!searchTerm) return products;
+      
+      const term = searchTerm.toLowerCase();
+      return products.filter(p => {
+        // Search by name
+        if (p.name.toLowerCase().includes(term)) return true;
+        
+        // Search by category
+        if (p.category.toLowerCase().includes(term)) return true;
+        
+        // Search by price (as string)
+        if (p.price.toString().includes(term)) return true;
+        
+        // Search by ID
+        if (p.id.toString().includes(term)) return true;
+        
+        return false;
+      });
+    }
+
+    // Update search hint
+    function updateSearchHint() {
+      const filtered = filterProducts();
+      if (searchTerm) {
+        searchHint.textContent = `Found ${filtered.length} product${filtered.length !== 1 ? 's' : ''} matching "${searchTerm}"`;
+      } else {
+        searchHint.textContent = `Showing all ${products.length} products`;
+      }
+    }
+
+    // Render products
+    function renderProducts() {
+      const filteredProducts = filterProducts();
+      const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+      
+      // Adjust current page if needed
+      if (currentPage > totalPages && totalPages > 0) {
+        currentPage = totalPages;
+      }
+      
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+      
+      productsGrid.innerHTML = '';
+      
+      if (paginatedProducts.length === 0) {
+        productsGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: #94a3b8;">No products found</div>';
+        pagination.style.display = 'none';
+        updateSearchHint();
+        return;
+      }
+      
+      paginatedProducts.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        
+        const stock = Math.max(0, product.stock);
+        const minStock = product.minStock || 10;
+        
+        let stockClass = '';
+        if (stock === 0) stockClass = 'out';
+        else if (stock <= minStock) stockClass = 'low';
+        
+        const cartItem = cart.find(item => item.id === product.id);
+        const inCartText = cartItem ? ` (${cartItem.quantity} in cart)` : '';
+        
+        card.innerHTML = `
+          <div class="action-buttons-card">
+            <button class="edit-btn" onclick="openEditProductModal(${product.id})">✏️</button>
+            <button class="delete-btn" onclick="openDeleteModal(${product.id})">🗑️</button>
+          </div>
+          <div class="product-name">${product.name}</div>
+          <div class="product-price">Rs. ${product.price.toFixed(2)}</div>
+          <div class="product-stock ${stockClass}">
+            ${stock} in stock${inCartText}
+          </div>
+          <div class="product-category">${product.category}</div>
+          <div class="product-id">ID: ${product.id}</div>
+          <button class="add-btn" onclick="addToCart(${product.id})" 
+                  ${stock === 0 ? 'disabled' : ''}>+</button>
+        `;
+        
+        productsGrid.appendChild(card);
+      });
+      
+      renderPagination(totalPages);
+      updateSearchHint();
+      updateProductCount();
+    }
+
+    // Render pagination
+    function renderPagination(totalPages) {
+      if (totalPages <= 1) {
+        pagination.style.display = 'none';
+        return;
+      }
+      
+      pagination.style.display = 'flex';
+      pagination.innerHTML = '';
+      
+      const prevBtn = document.createElement('button');
+      prevBtn.className = 'page-btn';
+      prevBtn.innerHTML = '«';
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderProducts();
+        }
+      };
+      pagination.appendChild(prevBtn);
+      
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+          const btn = document.createElement('button');
+          btn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+          btn.textContent = i;
+          btn.onclick = () => {
+            currentPage = i;
+            renderProducts();
+          };
+          pagination.appendChild(btn);
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+          const span = document.createElement('span');
+          span.textContent = '...';
+          pagination.appendChild(span);
+        }
+      }
+      
+      const nextBtn = document.createElement('button');
+      nextBtn.className = 'page-btn';
+      nextBtn.innerHTML = '»';
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderProducts();
+        }
+      };
+      pagination.appendChild(nextBtn);
+    }
+
+    // Handle search
+    function handleSearch(e) {
+      searchTerm = e.target.value;
+      currentPage = 1;
+      renderProducts();
+    }
+
+    // Update product count
+    function updateProductCount() {
+      document.getElementById('total-products').textContent = products.length;
+    }
+
+    // ============================================
+    // PRODUCT MODAL FUNCTIONS
+    // ============================================
+
+    function openAddProductModal() {
+      editingProductId = null;
+      document.getElementById('product-modal-title').textContent = 'Add New Product';
+      document.getElementById('save-product-btn').textContent = 'Add Product';
+      productForm.reset();
+      document.getElementById('product-minstock').value = '10';
+      document.getElementById('product-costprice').value = '0';
+      productModal.classList.add('active');
+    }
+
+    function openEditProductModal(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product) return;
+      
+      editingProductId = productId;
+      document.getElementById('product-modal-title').textContent = 'Edit Product';
+      document.getElementById('save-product-btn').textContent = 'Update Product';
+      
+      document.getElementById('product-id').value = product.id;
+      document.getElementById('product-name').value = product.name;
+      document.getElementById('product-price').value = product.price;
+      document.getElementById('product-stock').value = product.stock;
+      document.getElementById('product-category').value = product.category;
+      document.getElementById('product-minstock').value = product.minStock;
+      document.getElementById('product-costprice').value = product.costPrice;
+      
+      productModal.classList.add('active');
+    }
+
+    function closeProductModal() {
+      productModal.classList.remove('active');
+      productForm.reset();
+      editingProductId = null;
+    }
+
+    // Handle add/edit product
+    function handleAddProduct(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('product-name').value.trim();
+      const price = parseFloat(document.getElementById('product-price').value);
+      const stock = parseInt(document.getElementById('product-stock').value);
+      const category = document.getElementById('product-category').value.trim() || 'General';
+      const minStock = parseInt(document.getElementById('product-minstock').value) || 10;
+      const costPrice = parseFloat(document.getElementById('product-costprice').value) || 0;
+      
+      if (!name || price < 0 || stock < 0) {
+        showNotification('Please fill all fields correctly');
+        return;
+      }
+      
+      if (editingProductId) {
+        // UPDATE: Use existing ID
+        const productData = {
+          id: editingProductId,
+          name: name,
+          price: price,
+          stock: stock,
+          category: category,
+          minstock: minStock,
+          costprice: costPrice
+        };
+        
+        // Update local
+        const index = products.findIndex(p => p.id === editingProductId);
+        if (index !== -1) {
+          products[index] = { ...products[index], ...productData };
+        }
+        
+        // Submit to Google Sheets
+        submitForm('updateProduct', productData);
+        
+      } else {
+        // CREATE: Generate new ID locally first
+        const newId = getNextProductId();
+        
+        const productData = {
+          id: newId,
+          name: name,
+          price: price,
+          stock: stock,
+          category: category,
+          minstock: minStock,
+          costprice: costPrice
+        };
+        
+        // Add to local array
+        products.push(productData);
+        
+        // Submit to Google Sheets
+        submitForm('createProduct', productData);
+      }
+      
+      closeProductModal();
+      renderProducts();
+      saveToStorage();
+    }
+
+    // ============================================
+    // DELETE FUNCTIONS
+    // ============================================
+
+    function openDeleteModal(productId) {
+      deletingProductId = productId;
+      deleteModal.classList.add('active');
+    }
+
+    function closeDeleteModal() {
+      deleteModal.classList.remove('active');
+      deletingProductId = null;
+    }
+
+    function confirmDelete() {
+      if (!deletingProductId) return;
+      
+      // Remove from local array
+      products = products.filter(p => p.id !== deletingProductId);
+      
+      // Submit delete to Google Sheets
+      submitForm('deleteProduct', { id: deletingProductId });
+      
+      closeDeleteModal();
+      renderProducts();
+      saveToStorage();
+      showNotification('Product deleted');
+    }
+
+    // ============================================
+    // CART FUNCTIONS
+    // ============================================
+
+    function addToCart(productId) {
+      const product = products.find(p => p.id === productId);
+      if (!product || product.stock <= 0) return;
+      
+      const existing = cart.find(item => item.id === productId);
+      
+      if (existing) {
+        if (existing.quantity < product.stock) {
+          existing.quantity++;
+          showNotification(`${product.name} quantity updated`);
+        } else {
+          showNotification(`Only ${product.stock} available`);
+        }
+      } else {
+        cart.push({
+          id: productId,
+          name: product.name,
+          price: product.price,
+          quantity: 1
+        });
+        showNotification(`${product.name} added to cart`);
+      }
+      
+      renderCart();
+      renderProducts();
+      saveToStorage();
+    }
+
+    function removeFromCart(productId) {
+      cart = cart.filter(item => item.id !== productId);
+      renderCart();
+      renderProducts();
+      saveToStorage();
+      showNotification('Item removed');
+    }
+
+    function updateQuantity(productId, change) {
+      const item = cart.find(i => i.id === productId);
+      const product = products.find(p => p.id === productId);
+      if (!item || !product) return;
+      
+      const newQty = item.quantity + change;
+      
+      if (newQty < 1) {
+        removeFromCart(productId);
+        return;
+      }
+      
+      if (newQty > product.stock) {
+        showNotification(`Only ${product.stock} available`);
+        return;
+      }
+      
+      item.quantity = newQty;
+      renderCart();
+      saveToStorage();
+    }
+
+    function renderCart() {
+      if (cart.length === 0) {
+        cartItemsContainer.innerHTML = `
+          <div class="empty-cart">
+            <div class="empty-cart-icon">🛒</div>
+            <p>Your cart is empty</p>
+          </div>
+        `;
+        updateCartSummary();
+        return;
+      }
+      
+      let html = '';
+      let displayItems = cart.slice(0, 5);
+      
+      displayItems.forEach(item => {
+        html += `
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-price">Rs. ${item.price.toFixed(2)} × ${item.quantity}</div>
+            </div>
+            <div class="cart-item-controls">
+              <div style="display: flex; gap: 4px;">
+                <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                <span class="qty-value">${item.quantity}</span>
+                <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+              </div>
+              <button class="remove-btn" onclick="removeFromCart(${item.id})">×</button>
+            </div>
+          </div>
+        `;
+      });
+      
+      if (cart.length > 5) {
+        html += `<div class="view-all-btn" onclick="showAllCartItems()">View all ${cart.length} items</div>`;
+      }
+      
+      cartItemsContainer.innerHTML = html;
+      updateCartSummary();
+    }
+
+    function showAllCartItems() {
+      let html = '';
+      
+      cart.forEach(item => {
+        html += `
+          <div class="cart-item">
+            <div class="cart-item-info">
+              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-price">Rs. ${item.price.toFixed(2)} × ${item.quantity}</div>
+            </div>
+            <div class="cart-item-controls">
+              <div style="display: flex; gap: 4px;">
+                <button class="qty-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                <span class="qty-value">${item.quantity}</span>
+                <button class="qty-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+              </div>
+              <button class="remove-btn" onclick="removeFromCart(${item.id})">×</button>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += `<div class="view-all-btn" onclick="renderCart()">Show less</div>`;
+      cartItemsContainer.innerHTML = html;
+    }
+
+    function updateCartSummary() {
+      let subtotal = 0;
+      let totalItems = 0;
+      
+      cart.forEach(item => {
+        subtotal += item.price * item.quantity;
+        totalItems += item.quantity;
+      });
+      
+      document.getElementById('cart-items-count').textContent = totalItems;
+      document.getElementById('cart-subtotal').textContent = `Rs. ${subtotal.toFixed(2)}`;
+      document.getElementById('cart-total').textContent = `Rs. ${subtotal.toFixed(2)}`;
+    }
+
+    function clearCart() {
+      if (cart.length === 0) return;
+      if (confirm('Clear cart?')) {
+        cart = [];
+        renderCart();
+        renderProducts();
+        saveToStorage();
+        showNotification('Cart cleared');
+      }
+    }
+
+    // ============================================
+    // SALES PROCESS - FIXED STOCK UPDATE
+    // ============================================
+
+    function startSaleProcess() {
+      if (cart.length === 0) {
+        showNotification('Cart is empty');
+        return;
+      }
+      
+      // Check stock
+      for (const item of cart) {
+        const product = products.find(p => p.id === item.id);
+        if (!product || product.stock < item.quantity) {
+          showNotification(`Not enough stock for ${item.name}`);
+          return;
+        }
+      }
+      
+      currentSaleItems = [...cart];
+      currentBillTotal = calculateCartTotal();
+      customerModal.classList.add('active');
+    }
+
+    function calculateCartTotal() {
+      return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    }
+
+    function handleCustomerSubmit(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('customer-name').value.trim();
+      if (!name) {
+        showNotification('Customer name required');
+        return;
+      }
+      
+      generateBill(name);
+    }
+
+    function generateBillWithoutCustomer() {
+      generateBill('Walk-in Customer');
+    }
+
+    function generateBill(customerName) {
+      showLoading(true);
+      
+      try {
+        // Prepare sale data
+        const itemsJson = JSON.stringify(currentSaleItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.price * item.quantity
+        })));
+        
+        const billId = `BILL${String(totalSales + 1).padStart(6, '0')}`;
+        const subtotal = currentBillTotal;
+        const tax = 0;
+        const discount = 0;
+        const total = subtotal;
+        
+        // First, update stock in Google Sheets for each product
+        currentSaleItems.forEach(item => {
+          const product = products.find(p => p.id === item.id);
+          if (product) {
+            const newStock = product.stock - item.quantity;
+            alert(item.name)
+            
+            // Update product stock in Google Sheets
+            const stockUpdateData = {
+              ID: item.id,
+              Name: product.name,
+              Price: product.price,
+              Stock: newStock,
+              Category: product.category,
+              MinStock: product.minStock,
+              CostPrice: product.costPrice
+            };
+            
+            
+            // Submit stock update
+            submitForm('updateProduct', stockUpdateData);
+            
+            // Update local stock
+            product.Stock = newStock;
+          }
+        });
+        
+        // Then, record the sale
+        const saleData = {
+          billid: billId,
+          customername: customerName,
+          phone: document.getElementById('customer-phone').value,
+          email: document.getElementById('customer-email').value,
+          itemsjson: itemsJson,
+          subtotal: subtotal,
+          tax: tax,
+          discount: discount,
+          total: total,
+          paymentmethod: 'Cash',
+          status: 'Completed',
+          notes: ''
+        };
+        
+        submitForm('createSale', saleData);
+        
+        // Update stats
+        dailyProfit += total;
+        totalSales++;
+        
+        // Generate bill HTML
+        const billHTML = generateBillHTML(customerName);
+        
+        // Clear cart
+        cart = [];
+        
+        // Update UI
+        renderCart();
+        renderProducts();
+        updateStats();
+        saveToStorage();
+        
+        // Close modal and show bill
+        customerModal.classList.remove('active');
+        showBillPreview(billHTML, customerName);
+        
+        customerForm.reset();
+        
+        showNotification('Sale completed successfully!');
+        
+      } catch (error) {
+        console.error('Sale error:', error);
+        showNotification('Error completing sale');
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    function generateBillHTML(customerName) {
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      
+      let itemsHTML = '';
+      currentSaleItems.forEach((item, i) => {
+        const total = item.price * item.quantity;
+        itemsHTML += `
+          <div class="bill-item">
+            <span>${i+1}. ${item.name} × ${item.quantity}</span>
+            <span>Rs. ${total.toFixed(2)}</span>
+          </div>
+        `;
+      });
+      
+      return `
+        <div class="bill-header">
+          <h2>Shop Manager</h2>
+          <p>Bill #${String(totalSales).padStart(6, '0')}</p>
+        </div>
+        <div class="bill-info">
+          <div><strong>Customer:</strong> ${customerName}</div>
+          <div><strong>Date:</strong> ${dateStr} ${timeStr}</div>
+        </div>
+        <div class="bill-items">
+          <div class="bill-item-header">
+            <span>Item</span>
+            <span>Amount</span>
+          </div>
+          ${itemsHTML}
+        </div>
+        <div class="bill-total">
+          <span>Total</span>
+          <span>Rs. ${currentBillTotal.toFixed(2)}</span>
+        </div>
+      `;
+    }
+
+    function showBillPreview(html) {
+      document.getElementById('bill-preview').innerHTML = html;
+      printBillDiv.innerHTML = html;
+      billModal.classList.add('active');
+    }
+
+    function printBill() {
+      const win = window.open('', '_blank');
+      win.document.write(`
+        <html>
+        <head>
+          <title>Bill</title>
+          <style>
+            body { font-family: Arial; padding: 20px; }
+            .bill-header { text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 15px; }
+            .bill-item { display: flex; justify-content: space-between; margin: 8px 0; }
+            .bill-total { border-top: 2px solid #2563eb; padding-top: 10px; font-weight: bold; }
+            @media print { .no-print { display: none; } }
+          </style>
+        </head>
+        <body>${printBillDiv.innerHTML}</body>
+        </html>
+      `);
+      win.document.close();
+      win.print();
+    }
+
+    // ============================================
+    // STORAGE & STATS
+    // ============================================
+
+    function loadFromStorage() {
+      try {
+        const saved = localStorage.getItem('shopProducts');
+        if (saved) products = JSON.parse(saved);
+        const savedCart = localStorage.getItem('shopCart');
+        if (savedCart) cart = JSON.parse(savedCart);
+        const savedProfit = localStorage.getItem('dailyProfit');
+        if (savedProfit) dailyProfit = parseFloat(savedProfit);
+        const savedSales = localStorage.getItem('totalSales');
+        if (savedSales) totalSales = parseInt(savedSales);
+      } catch (e) {
+        console.error('Storage error:', e);
+      }
+    }
+
+    function saveToStorage() {
+      localStorage.setItem('shopProducts', JSON.stringify(products));
+      localStorage.setItem('shopCart', JSON.stringify(cart));
+      localStorage.setItem('dailyProfit', dailyProfit.toString());
+      localStorage.setItem('totalSales', totalSales.toString());
+    }
+
+    function updateStats() {
+      document.getElementById('daily-profit').textContent = `Rs. ${dailyProfit.toFixed(2)}`;
+      document.getElementById('total-sales').textContent = totalSales;
+    }
+
+    function resetDay() {
+      if (confirm('Reset daily stats?')) {
+        dailyProfit = 0;
+        totalSales = 0;
+        updateStats();
+        saveToStorage();
+        showNotification('Day reset');
+      }
+    }
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+
+    function setupEventListeners() {
+      productSearch.addEventListener('input', handleSearch);
+      addProductBtn.addEventListener('click', openAddProductModal);
+      cancelProductBtn.addEventListener('click', closeProductModal);
+      productForm.addEventListener('submit', handleAddProduct);
+      
+      // Delete modal
+      cancelDeleteBtn.addEventListener('click', closeDeleteModal);
+      confirmDeleteBtn.addEventListener('click', confirmDelete);
+      
+      // Cart
+      clearCartBtn.addEventListener('click', clearCart);
+      completeSaleBtn.addEventListener('click', startSaleProcess);
+      resetDayBtn.addEventListener('click', resetDay);
+      
+      // Customer modal
+      customerForm.addEventListener('submit', handleCustomerSubmit);
+      skipCustomerBtn.addEventListener('click', generateBillWithoutCustomer);
+      
+      // Bill modal
+      closeBillBtn.addEventListener('click', () => billModal.classList.remove('active'));
+      printBillBtn.addEventListener('click', printBill);
+      
+      // Close modals on overlay click
+      document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal-overlay')) {
+          closeAllModals();
+        }
+      });
+    }
+
+    // Global functions
+    window.addToCart = addToCart;
+    window.removeFromCart = removeFromCart;
+    window.updateQuantity = updateQuantity;
+    window.showAllCartItems = showAllCartItems;
+    window.openEditProductModal = openEditProductModal;
+    window.openDeleteModal = openDeleteModal;
+
+    // Start
+    window.addEventListener('DOMContentLoaded', () => {
+      loadProducts();
+      setupEventListeners();
+      renderCart();
+      updateStats();
+    });
+  </script>
+</body>
+</html>
